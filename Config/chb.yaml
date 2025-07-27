@@ -1,0 +1,70 @@
+model:
+  target: Models.interpretable_diffusion.gaussian_diffusion.Diffusion_DGCL
+  params:
+    seq_length: 256
+    feature_size: 23
+    n_layer_enc: 3
+    n_layer_dec: 2
+    d_model: 64
+    timesteps: 500
+    sampling_timesteps: 100
+    loss_type: 'l1'
+    beta_schedule: 'cosine'
+    n_heads: 4
+    mlp_hidden_times: 4
+    attn_pd: 0.0
+    resid_pd: 0.0
+    kernel_size: 1
+    padding_size: 0
+
+classifier:
+  target: Models.interpretable_diffusion.classifier.Classifier
+  params:
+    seq_length: 256
+    feature_size: 23
+    num_classes: 2
+    n_layer_enc: 3
+    n_embd: 64
+    n_heads: 4
+    mlp_hidden_times: 4
+    attn_pd: 0.0
+    resid_pd: 0.0
+    max_len: 256  # seq_length
+    num_head_channels: 16
+
+solver:
+  base_lr: 1.0e-5
+  max_epochs: 12000
+  results_folder: ./Checkpoints_eeg
+  gradient_accumulate_every: 2
+  save_cycle: 1200  # max_epochs // 10
+  ema:
+    decay: 0.995
+    update_interval: 10
+  
+  scheduler:
+    target: engine.lr_sch.ReduceLROnPlateauWithWarmup
+    params:
+      factor: 0.5
+      patience: 500
+      min_lr: 1.0e-5
+      threshold: 1.0e-2
+      threshold_mode: rel
+      warmup_lr: 1.0e-3
+      warmup: 200
+      verbose: False
+
+dataloader:
+  train_dataset:
+    target: Utils.Data_utils.chb_dataset.CHBDataset
+    params:
+      data_root: /mnt/proj/Diffusion_DGCL/Data/datasets/CHBMIT/eeg-predictive_train.npz
+      window: 256
+      save2npy: True
+      neg_one_to_one: True
+      period: train
+      rate: 0.2
+
+  batch_size: 128
+  sample_size: 256
+  shuffle: True
