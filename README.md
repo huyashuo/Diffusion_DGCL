@@ -4,6 +4,12 @@
 生成核心运行部分在\Experiments\chb_multiple_classes.ipynb或者demo.py中
 ~~~
 
+## Generate Data or Train Data
+
+~~~bash
+生成、测试以及训练数据文件过大，需要的可以联系作者
+~~~
+
 ## Metric Code
 
 ~~~bash
